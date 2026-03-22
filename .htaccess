@@ -1,0 +1,43 @@
+# ─── HTTPS Weiterleitung ───
+RewriteEngine On
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# ─── www → non-www ───
+RewriteCond %{HTTP_HOST} ^www\.brot-stoecki\.de [NC]
+RewriteRule ^(.*)$ https://brot-stoecki.de/$1 [L,R=301]
+
+# ─── Trailing Slash ───
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_URI} !(.*)/$
+RewriteRule ^(.*)$ https://brot-stoecki.de/$1/ [L,R=301]
+
+# ─── 404 Fehlerseite ───
+ErrorDocument 404 /404.html
+
+# ─── Gzip Komprimierung ───
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/javascript application/javascript image/svg+xml
+</IfModule>
+
+# ─── Browser Caching ───
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/css "access plus 1 month"
+  ExpiresByType text/javascript "access plus 1 month"
+  ExpiresByType image/jpeg "access plus 6 months"
+  ExpiresByType image/jpg "access plus 6 months"
+  ExpiresByType image/png "access plus 6 months"
+  ExpiresByType image/webp "access plus 6 months"
+  ExpiresByType text/html "access plus 1 day"
+</IfModule>
+
+# ─── Sicherheits-Header ───
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options nosniff
+  Header always set X-Frame-Options SAMEORIGIN
+  Header always set Referrer-Policy strict-origin-when-cross-origin
+</IfModule>
+
+# ─── Verzeichnis-Listing deaktivieren ───
+Options -Indexes
